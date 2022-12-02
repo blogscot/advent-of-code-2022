@@ -13,10 +13,10 @@
 ;; outcome of the round (0 if you lost, 3 if the round was a draw, and 6
 ;; if you won).
 
-(defparameter opponent '((A . Rock) (B . Paper) (C . Scissors)))
-(defparameter player   '((X . Rock) (Y . Paper) (Z . Scissors)))
+(defparameter opponent '((a . rock) (b . paper) (c . scissors)))
+(defparameter player   '((x . rock) (y . paper) (z . scissors)))
 (defparameter winner-scoring  '((player1 0) (draw 3) (player2 6)))
-(defparameter object-scoring  '((Rock 1) (Paper 2) (Scissors 3)))
+(defparameter object-scoring  '((rock 1) (paper 2) (scissors 3)))
 
 (defun read-rounds (file)
   (mapcar (lambda (line) (split-string line :separator '(#\Space)))
@@ -33,19 +33,21 @@
 (defun winner (p1 p2)
   (cond
     ((eql p1 p2) 'draw)
-    ((and (eql p1 'Rock) (eql p2 'Paper)) 'player2)
-    ((and (eql p1 'Rock) (eql p2 'Scissors)) 'player1)
-    ((and (eql p1 'Paper) (eql p2 'Rock)) 'player1)
-    ((and (eql p1 'Paper) (eql p2 'Scissors)) 'player2)
-    ((and (eql p1 'Scissors) (eql p2 'Rock)) 'player2)
-    ((and (eql p1 'Scissors) (eql p2 'Paper)) 'player1)))
+    ((and (eql p1 'rock) (eql p2 'paper)) 'player2)
+    ((and (eql p1 'rock) (eql p2 'scissors)) 'player1)
+    ((and (eql p1 'paper) (eql p2 'rock)) 'player1)
+    ((and (eql p1 'paper) (eql p2 'scissors)) 'player2)
+    ((and (eql p1 'scissors) (eql p2 'rock)) 'player2)
+    ((and (eql p1 'scissors) (eql p2 'paper)) 'player1)))
+
+(defun score (rounds)
+  (loop for (o p) in rounds
+        for object-score = (second (assoc p object-scoring))
+        for winner-score = (second (assoc (winner o p) winner-scoring))
+        sum (+ object-score winner-score)))
 
 (defun get-solution-part1 (file)
-  (let ((rounds (convert (read-rounds file))))
-    (loop for (o p) in rounds
-          for object-score = (second (assoc p object-scoring))
-          for winner-score = (second (assoc (winner o p) winner-scoring))
-          sum (+ object-score winner-score))))
+  (score (convert (read-rounds file))))
 
 ;; (get-solution-part1 #p"data.txt") => 15 (4 bits, #xF, #o17, #b1111)
 ;; (get-solution-part1 #p"puzzle.txt") => 9651 (14 bits, #x25B3)
@@ -54,7 +56,7 @@
 ;; X means you need to lose, Y means you need to end the round in a draw, and Z means you need to win.
 
 
-(defparameter player* '((X . lose) (Y . draw) (Z . win)))
+(defparameter player* '((x . lose) (y . draw) (z . win)))
 (defun convert-player* (item) (cdr (assoc (intern item) player*)))
 
 (defun convert* (rounds)
@@ -73,13 +75,10 @@
     ((and (eql result 'win) (eql p1 'scissors)) 'rock)))
 
 (defun get-solution-part2 (file)
-  (let* ((rounds (convert* (read-rounds file)))
-         (converted-rounds (mapcar (lambda (round) (destructuring-bind (item result) round
-                                                     (list item (pairing item result)))) rounds)))
-    (loop for (o p) in converted-rounds
-          for object-score = (second (assoc p object-scoring))
-          for winner-score = (second (assoc (winner o p) winner-scoring))
-          sum (+ object-score winner-score))))
+  (let ((rounds (mapcar (lambda (round) (destructuring-bind (item result) round
+                                          (list item (pairing item result))))
+                        (convert* (read-rounds file)))))
+    (score rounds)))
 
 ;; (get-solution-part2 #p"data.txt") => 12 (4 bits, #xC, #o14, #b1100)
 ;; (get-solution-part2 #p"puzzle.txt") => 10560 (14 bits, #x2940)
