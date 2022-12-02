@@ -1,11 +1,7 @@
 (defpackage :day1
-  (:use :cl :str))
+  (:use :cl :uiop))
 
 (in-package :day1)
-
-
-(defun read-data (file)
-  (lines (from-file file)))
 
 (defun group (items &optional (group nil) (groups nil))
   (if (null items)
@@ -16,7 +12,7 @@
             (group (rest items) (push (parse-integer item) group) groups)))))
 
 (defun get-solution-part1 (file)
-  (let ((items (read-data file)))
+  (let ((items (read-file-lines file)))
     (apply #'max (group items))))
 
 
@@ -25,7 +21,7 @@
 
 
 (defun get-solution-part2 (file)
-  (let ((items (read-data file)))
+  (let ((items (read-file-lines file)))
     (apply #'+ (subseq (sort (group items) #'>) 0 3))))
 
 ;; (get-solution-part2 #p"data.txt") => 45000 (16 bits, #xAFC8)
