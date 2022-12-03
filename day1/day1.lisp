@@ -1,5 +1,6 @@
 (defpackage :day1
-  (:use :cl :uiop))
+  (:use :cl :uiop)
+  (:import-from :cl-ppcre :split))
 
 (in-package :day1)
 
@@ -26,3 +27,16 @@
 
 ;; (get-solution-part2 #p"data.txt") => 45000 (16 bits, #xAFC8)
 ;; (get-solution-part2 #p"puzzle.txt") => 208180 (18 bits, #x32D34)
+
+;; Solution 2 using cl-ppcre
+
+;; (ql:quickload :cl-ppcre)
+
+(defun read-calories (file)
+  (let ((lines (read-file-string file)))
+    (mapcar (lambda (line)
+              (apply #'+ (mapcar #'parse-integer (split "\\n" line))))
+            (split "\\n\\n" lines))))
+
+;; (apply #'max (read-calories "puzzle.txt"))
+;; (apply #'+ (subseq (sort (read-calories "puzzle.txt") #'>) 0 3))
