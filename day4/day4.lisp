@@ -19,11 +19,14 @@
     (or (and (>= a x) (<= b y))
         (and (>= x a) (<= y b)))))
 
-(defun get-solution-part1 (file)
+(defun get-solution (file f)
   (let* ((assignments (read-section-assignments file))
          (pairings (loop for (a b) on assignments by #'cddr
-                                   collect (fully-contained-p (list a b)))))
+                                   collect (funcall f (list a b)))))
     (length (remove nil pairings))))
+
+(defun get-solution-part1 (file)
+  (get-solution file #'fully-contained-p))
 
 ;; (get-solution-part1 "data.txt")
 ;; (get-solution-part1 "puzzle.txt")
@@ -35,10 +38,8 @@
                     (loop for z from x to y collect z))))
 
 (defun get-solution-part2 (file)
-  (let* ((assignments (read-section-assignments file))
-         (pairings (loop for (a b) on assignments by #'cddr
-                                   collect (overlaps-p (list a b)))))
-    (length (remove nil pairings))))
+  (get-solution file #'overlaps-p))
+
 
 ;; (get-solution-part2 "data.txt")
 ;; (get-solution-part2 "puzzle.txt")
