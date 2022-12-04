@@ -1,13 +1,17 @@
 (defpackage :day4
-  (:use :cl :uiop))
+  (:use :cl)
+  (:import-from :uiop :read-file-lines)
+  (:import-from :str :split))
+
+;; (ql:quickload :str)
 
 (in-package :day4)
 
 (defun read-section-assignments (file)
   (mapcan (lambda (sections)
             (mapcar (lambda (pair)
-                      (mapcar #'parse-integer (split-string pair :separator '(#\-))))
-                    (split-string sections :separator '(#\,))))
+                      (mapcar #'parse-integer (split "-" pair)))
+                    (split "," sections)))
           (read-file-lines file)))
 
 (defun fully-contained-p (pairing)
