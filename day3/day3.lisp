@@ -35,7 +35,7 @@
   (let* ((rucksacks (read-rucksacks file))
          (groups (loop for (a b c) on rucksacks by #'cdddr
        collect (list a b c))))
-   (apply #'+ (mapcar #'convert-to-priority (mapcar #'find-badge groups)))))
+    (reduce #'+ (mapcar #'find-badge groups) :key #'convert-to-priority)))
 
 
 ;; (get-solution-part2 "data.txt")

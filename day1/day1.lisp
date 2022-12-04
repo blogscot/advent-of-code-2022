@@ -23,7 +23,7 @@
 
 (defun get-solution-part2 (file)
   (let ((items (read-file-lines file)))
-    (apply #'+ (subseq (sort (group items) #'>) 0 3))))
+    (reduce #'+ (sort (group items) #'>) :end 3)))
 
 ;; (get-solution-part2 #p"data.txt") => 45000 (16 bits, #xAFC8)
 ;; (get-solution-part2 #p"puzzle.txt") => 208180 (18 bits, #x32D34)
