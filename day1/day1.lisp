@@ -35,8 +35,8 @@
 (defun read-calories (file)
   (let ((lines (read-file-string file)))
     (mapcar (lambda (line)
-              (apply #'+ (mapcar #'parse-integer (split "\\n" line))))
+              (reduce #'+ (split "\\n" line) :key #'parse-integer))
             (split "\\n\\n" lines))))
 
 ;; (apply #'max (read-calories "puzzle.txt"))
-;; (apply #'+ (subseq (sort (read-calories "puzzle.txt") #'>) 0 3))
+;; (reduce #'+ (sort (read-calories "puzzle.txt") #'>) :end 3)
