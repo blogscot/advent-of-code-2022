@@ -1,12 +1,11 @@
+(ql:quickload '(:str :cl-ppcre))
+
 (defpackage :day5
   (:use :cl :uiop)
   (:import-from :str :split)
   (:import-from :cl-ppcre :register-groups-bind))
 
 (in-package :day5)
-
-;; (ql:quickload :str)
-;; (ql:quickload "cl-ppcre")
 
 (defun load-data (file)
   (let* ((lines (read-file-lines file))

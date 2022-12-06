@@ -1,9 +1,9 @@
+(ql:quickload :str)
+
 (defpackage :day4
   (:use :cl)
   (:import-from :uiop :read-file-lines)
   (:import-from :str :split))
-
-;; (ql:quickload :str)
 
 (in-package :day4)
 
@@ -39,7 +39,6 @@
 
 (defun get-solution-part2 (file)
   (get-solution file #'overlaps-p))
-
 
 ;; (get-solution-part2 "data.txt")
 ;; (get-solution-part2 "puzzle.txt")

@@ -1,3 +1,5 @@
+(ql:quickload :cl-ppcre)
+
 (defpackage :day1
   (:use :cl :uiop)
   (:import-from :cl-ppcre :split))
@@ -29,8 +31,6 @@
 ;; (get-solution-part2 #p"puzzle.txt") => 208180 (18 bits, #x32D34)
 
 ;; Solution 2 using cl-ppcre
-
-;; (ql:quickload :cl-ppcre)
 
 (defun read-calories (file)
   (let ((lines (read-file-string file)))
