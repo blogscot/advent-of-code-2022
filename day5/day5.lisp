@@ -1,8 +1,7 @@
-(ql:quickload '(:str :cl-ppcre))
+(ql:quickload "cl-ppcre")
 
 (defpackage :day5
   (:use :cl :uiop)
-  (:import-from :str :split)
   (:import-from :cl-ppcre :register-groups-bind))
 
 (in-package :day5)

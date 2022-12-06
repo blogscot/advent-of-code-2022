@@ -19,8 +19,8 @@
 (defparameter object-scoring  '((rock 1) (paper 2) (scissors 3)))
 
 (defun read-rounds (file)
-  (mapcar (lambda (line) (split-string line :separator '(#\Space)))
-          (read-file-lines file)))
+  (mapcar (lambda (line) (split-string line))
+          (READ-file-lines file)))
 
 (defun convert (rounds)
   (mapcar (lambda (round) (destructuring-bind (o p) round
