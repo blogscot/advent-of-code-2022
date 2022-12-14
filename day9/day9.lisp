@@ -1,4 +1,4 @@
-(ql:quickload '("fiveam" "alexandria"))
+(ql:quickload '("alexandria"))
 (declaim (optimize (debug 3)))
 
 (defpackage :day9
@@ -48,8 +48,7 @@
                               ("U" '(1 0))
                               ("L" '(0 -1))
                               ("D" '(-1 0))
-                              ("R" '(0 1))))
-              )) motions))
+                              ("R" '(0 1)))))) motions))
 
 (defun get-solution-part1 (file)
   (let* ((motions (get-motions file))
@@ -65,3 +64,41 @@
 
 (get-solution-part1 "../resources/day9.txt")
 (get-solution-part1 "../resources/puzzle9.txt")
+
+
+; move head knot of rope
+; for each remaining knot calculate and update its next position
+; store the position of tail knot
+
+(defparameter rope-length 10)
+
+(defparameter rope (loop repeat 10 collect '(0 0)))
+
+(defun add (p1 p2)
+  (list (+ (first p1) (first p2)) (+ (second p1) (second p2))))
+
+(defun move-head (rope move)
+  (let ((head (first rope)))
+    (setf (first rope) (add head move))
+    (first rope)))
+
+(defun move-body ()
+ (loop for a from 0 upto 8
+       for b = (1+ a)
+       for next-pos = (find-next (elt rope a) (elt rope b))
+       do (setf (elt rope b) next-pos)))
+
+(defun get-solution-part2 (file)
+  (let* ((motions (get-motions file))
+         (moves (get-moves motions))
+         (rope (loop repeat rope-length collect '(0 0)))
+         (path '((0 0))))
+    (loop for move in moves
+          do (progn
+               (move-head rope move)
+               (move-body)
+               (push (alexandria:lastcar rope) path)))
+    (length (remove-duplicates path :test #'equal))))
+
+(get-solution-part2 "../resources/day9-larger.txt")
+(get-solution-part2 "../resources/puzzle9.txt")
