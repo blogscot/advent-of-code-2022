@@ -50,13 +50,15 @@
                               ("D" '(-1 0))
                               ("R" '(0 1)))))) motions))
 
+(defun add (p1 p2)
+  (list (+ (first p1) (first p2)) (+ (second p1) (second p2))))
+
 (defun get-solution-part1 (file)
   (let* ((motions (get-motions file))
          (moves (get-moves motions))
          (path '((0 0))))
     (reduce (lambda (head-pos move)
-              (let* ((new-head-pos (list (+ (first head-pos) (first move))
-                                         (+ (second head-pos) (second move))))
+              (let* ((new-head-pos (add head-pos move))
                      (new-tail-pos (find-next new-head-pos (first path))))
                 (push new-tail-pos path)
                 new-head-pos)) moves :initial-value '(0 0))
@@ -70,12 +72,7 @@
 ; for each remaining knot calculate and update its next position
 ; store the position of tail knot
 
-(defparameter rope-length 10)
-
-(defparameter rope (loop repeat 10 collect '(0 0)))
-
-(defun add (p1 p2)
-  (list (+ (first p1) (first p2)) (+ (second p1) (second p2))))
+(defparameter *rope-length* 10)
 
 (defun move-head (rope move)
   (let ((head (first rope)))
@@ -83,15 +80,15 @@
     (first rope)))
 
 (defun move-body ()
- (loop for a from 0 upto 8
-       for b = (1+ a)
-       for next-pos = (find-next (elt rope a) (elt rope b))
-       do (setf (elt rope b) next-pos)))
+  (loop for a from 0 upto (- *rope-length* 2)
+        for b = (1+ a)
+        for next-pos = (find-next (elt rope a) (elt rope b))
+        do (setf (elt rope b) next-pos)))
 
 (defun get-solution-part2 (file)
   (let* ((motions (get-motions file))
          (moves (get-moves motions))
-         (rope (loop repeat rope-length collect '(0 0)))
+         (rope (loop repeat *rope-length* collect '(0 0)))
          (path '((0 0))))
     (loop for move in moves
           do (progn
