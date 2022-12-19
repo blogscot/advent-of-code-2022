@@ -62,11 +62,11 @@
     (setf (items from) nil)
     (incf (throws from))))
 
-(defun process (monkey)
+(defun process (state monkey worry-fn)
   (let ((items (items monkey))
         (operation (operation monkey))
         (divisible-by (divisible-by monkey)))
-    (mapcar (lambda (item) (let* ((result (floor (funcall operation item) 3))
+    (mapcar (lambda (item) (let* ((result (funcall worry-fn (funcall operation item)))
                                   (monkey-index (if (zerop (mod result divisible-by))
                                                     (throw-on-true monkey)
                                                     (throw-on-false monkey)))
@@ -75,19 +75,23 @@
 
 (defun get-solution-part1 (file)
   (let* ((data (mapcar #'str:lines (get-monkey-data file)))
-         (state (mapcar #'parse-monkey data)))
+         (state (mapcar #'parse-monkey data))
+         (worry-fn (lambda (x) (floor x 3))))
     (dotimes (i 20)
-      (mapcar #'process state))
+      (mapcar (lambda (monkey) (process state monkey worry-fn)) state))
     (apply #'* (subseq (sort (mapcar #'throws state) #'>) 0 2))))
 
 (get-solution-part1 "../resources/day11.txt")
 (get-solution-part1 "../resources/puzzle11.txt")
 
-(defparameter monkey-data (mapcar #'str:lines (get-monkey-data "../resources/day11.txt")))
+(defun get-solution-part2 (file n)
+  (let* ((data (mapcar #'str:lines (get-monkey-data file)))
+         (state (mapcar #'parse-monkey data))
+         (worry-value (apply #'* (mapcar #'divisible-by state)))
+         (worry-fn (lambda (x) (mod x worry-value))))
+    (dotimes (i n)
+      (mapcar (lambda (monkey) (process state monkey worry-fn)) state))
+    (apply #'* (subseq (sort (mapcar #'throws state) #'>) 0 2))))
 
-(defparameter state (mapcar #'parse-monkey monkey-data))
-state
- ; => (#<MONKEY ((79 98) 23 2 3 0)>
- ; #<MONKEY ((54 65 75 74) 19 2 0 0)>
- ; #<MONKEY ((79 60 97) 13 1 3 0)>
- ; #<MONKEY ((74) 17 0 1 0)>)
+;; (get-solution-part2 "../resources/day11.txt" 10000)
+;; (get-solution-part2 "../resources/puzzle11.txt" 10000)
