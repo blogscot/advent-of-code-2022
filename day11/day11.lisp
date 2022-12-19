@@ -73,16 +73,16 @@
                                   (next-monkey (elt state monkey-index)))
                              (throw-from-to monkey next-monkey result))) items)))
 
-(defun get-solution-part1 (file)
+(defun get-solution-part1 (file n)
   (let* ((data (mapcar #'str:lines (get-monkey-data file)))
          (state (mapcar #'parse-monkey data))
          (worry-fn (lambda (x) (floor x 3))))
-    (dotimes (i 20)
+    (dotimes (i n)
       (mapcar (lambda (monkey) (process state monkey worry-fn)) state))
     (apply #'* (subseq (sort (mapcar #'throws state) #'>) 0 2))))
 
-(get-solution-part1 "../resources/day11.txt")
-(get-solution-part1 "../resources/puzzle11.txt")
+;; (get-solution-part1 "../resources/day11.txt" 20)
+;; (get-solution-part1 "../resources/puzzle11.txt" 20)
 
 (defun get-solution-part2 (file n)
   (let* ((data (mapcar #'str:lines (get-monkey-data file)))
