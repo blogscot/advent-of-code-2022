@@ -33,11 +33,11 @@
 (defun find-start-pos (heightmap) (find-char heightmap *start-char*))
 (defun find-end-pos (heightmap) (find-char heightmap *end-char*))
 
-(defun neighbourp (ch2 ch1)
-  "Returns T if ch2 is a valid neighbour of ch1."
-  (<= (- (char-code ch2) (char-code ch1)) 1))
+(defun neighbourp (next current)
+  "Returns T if next is a valid neighbour of ch1."
+  (<= (- (char-code next) (char-code current)) 1))
 
-(defun find-neighbours (heightmap position)
+(defun find-neighbours (heightmap position &key (test #'neighbourp))
   "Finds neighbours of position"
   (destructuring-bind (row col) position
     (loop with letter = (aref heightmap row col)
@@ -46,9 +46,10 @@
           for next-col = (+ col c)
           when (and (<= 0 next-row (1- (array-dimension heightmap 0)))
                     (<= 0 next-col (1- (array-dimension heightmap 1)))
-                    (neighbourp (aref heightmap next-row next-col) letter))
+                    (funcall test (aref heightmap next-row next-col) letter))
             collect (list next-row next-col))))
 
+;; Step through the map. When done read the value at the end position
 (defun get-solution-part1 (heightmap)
   (let* ((start-pos (find-start-pos heightmap))
          (end-pos (find-end-pos heightmap))
@@ -59,8 +60,7 @@
     (setf (aref heightmap (first start-pos) (second start-pos)) #\a
           (aref heightmap (first end-pos) (second end-pos)) #\z
           (aref routemap (first start-pos) (second start-pos)) 0)
-    (loop named my-loop
-          while queue
+    (loop while queue
           for s = (pop queue)
           for num-steps = (aref routemap (first s) (second s))
           for neighbours = (find-neighbours heightmap s)
@@ -77,3 +77,45 @@
 
 (get-solution-part1 (get-heightmap example-file))
 (get-solution-part1 (get-heightmap puzzle-file))
+
+(defun find-starting-points (heightmap)
+  (let* ((start-pos (find-start-pos heightmap))
+         (queue (list start-pos))
+         (already-seen (list start-pos)))
+    (loop while queue
+          for s = (pop queue)
+          for neighbours = (find-neighbours heightmap s :test (lambda (next current) (declare (ignore current)) (equal next #\a)))
+          do (loop for neighbour in neighbours
+                   for value = (aref heightmap (first neighbour) (second neighbour))
+                   unless (member neighbour already-seen :test 'equal)
+                     do (progn
+                          (push neighbour already-seen)
+                          (push neighbour queue))))
+    already-seen))
+
+;; Start stepping from the end then select the minimum from all the possible start points
+(defun get-solution-part2 (heightmap)
+  (let* ((start-pos (find-start-pos heightmap))
+         (end-pos (find-end-pos heightmap))
+         (queue (list end-pos))
+         (routemap (make-array (list (array-dimension heightmap 0)
+                                     (array-dimension heightmap 1))
+                               :initial-element nil))
+         (starting-points (find-starting-points heightmap)))
+    (setf (aref heightmap (first start-pos) (second start-pos)) #\a
+          (aref heightmap (first end-pos) (second end-pos)) #\z
+          (aref routemap (first end-pos) (second end-pos)) 0)
+    (loop while queue
+          for s = (pop queue)
+          for num-steps = (aref routemap (first s) (second s))
+          for neighbours = (find-neighbours heightmap s :test (lambda (next current) (<= (- (char-code current) (char-code next)) 1)))
+          do (loop for (row col) in neighbours
+                   for value = (aref routemap row col)
+                   when (null value)
+                     do (progn
+                          (setf (aref routemap row col) (1+ num-steps))
+                          (setf queue (append queue (list (list row col)))))))
+    (apply 'min (mapcar (lambda (point) (aref routemap (first point) (second point))) starting-points))))
+
+(get-solution-part2 (get-heightmap example-file))
+(get-solution-part2 (get-heightmap puzzle-file))
