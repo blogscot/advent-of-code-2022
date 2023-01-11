@@ -50,3 +50,14 @@
 
 ; (get-solution-part1 example-file)
 ; (get-solution-part1 puzzle-file)
+
+(defun get-solution-part2 (file)
+  (let* ((two '((2)))
+         (six '((6)))
+         (packets (get-packets file))
+         (packets (append (apply 'concatenate 'list packets) (list two six)))
+         (sorted (sort (copy-seq packets) (lambda (a b) (minusp (compare a b))))))
+    (* (1+ (position two sorted)) (1+ (position six sorted)))))
+
+; (get-solution-part2 example-file)
+; (get-solution-part2 puzzle-file)
